@@ -1,61 +1,38 @@
 # Authors: Nicolas Pinto <pinto@alum.mit.edu>
 # License: BSD
 
+__all__ = [
+    'DEFAULT_LBFGS_PARAMS', 'LBFGSPearsonRegressor'
+]
+
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
 import theano
 from theano import tensor
 
-
-EPSILON = 1e-6
-
-
-# ----------------------------------------------------------------------------
-# -- Helpers
-# ----------------------------------------------------------------------------
-def normalize_pearson_like(X):
-
-    assert X.ndim == 2
-    axis = 1
-
-    rows, cols = X.shape
-
-    # XXX: you should use keepdims with numpy-1.7
-    X_sum = np.apply_over_axes(np.sum, X, (axis,))
-    X_ssq = np.apply_over_axes(np.sum, X ** 2., (axis,))
-
-    X_num = X - X_sum / cols
-
-    X_div = np.sqrt((X_ssq - (X_sum ** 2.0) / cols).clip(0, np.inf))
-    np.putmask(X_div, X_div < EPSILON, EPSILON)  # avoid zero division
-
-    out = X_num / X_div
-
-    return out
-
-
-def theano_corrcoef(X):
-    """Returns correlation coefficients"""
-    Xm = (X.T - X.mean(1).T).T
-    Xmn = (Xm.T / tensor.sqrt((Xm ** 2.).sum(1)).T).T
-    cc = tensor.dot(Xmn, Xmn.T)
-    return cc
-
-
-LBFGS_PARAMS = dict(
-    iprint=1,
-    factr=1e11,
-    maxfun=20,
-    )
+from .util import normalize_pearson_like, theano_corrcoef
 
 
 # ----------------------------------------------------------------------------
 # -- LBFGS-based Pearson Regressor
 # ----------------------------------------------------------------------------
+DEFAULT_N_FILTERS = 128
+DEFAULT_L2_REGULARIZATION = 1e-3
+DEFAULT_L1_REGULARIZATION = 1e-3
+DEFAULT_LBFGS_PARAMS = dict(
+    iprint=1,
+    factr=1e7,
+    maxfun=1000,
+    )
+
+
 class LBFGSPearsonRegressor(object):
 
-    def __init__(self, n_filters=128, lbfgs_params=LBFGS_PARAMS):
+    def __init__(self, n_filters=DEFAULT_N_FILTERS,
+                 l2_regularization=DEFAULT_L2_REGULARIZATION,
+                 l1_regularization=DEFAULT_L1_REGULARIZATION,
+                 lbfgs_params=DEFAULT_LBFGS_PARAMS):
 
         self.rng = np.random.RandomState(42)
 
@@ -78,6 +55,13 @@ class LBFGSPearsonRegressor(object):
 
         similarity = tensor.dot(t_gv, t_gt)
         loss = 1 - similarity
+
+        l2_loss = tensor.dot(t_fbmn.flatten(), t_fbmn.flatten())
+        loss += l2_regularization * l2_loss
+
+        l1_loss = tensor.sum(abs(t_fbmn.flatten()))
+        loss += l2_regularization * l1_loss
+
         dloss_fb = theano.grad(loss, t_fb).flatten()
 
         _f = theano.function([t_X, t_fb],
