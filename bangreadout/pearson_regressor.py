@@ -1,6 +1,8 @@
 # Authors: Nicolas Pinto <pinto@alum.mit.edu>
 # License: BSD
 
+# Status: Experimental
+
 __all__ = [
     'DEFAULT_LBFGS_PARAMS', 'LBFGSPearsonRegressor'
 ]
