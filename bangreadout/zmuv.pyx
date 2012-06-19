@@ -17,7 +17,7 @@ cdef float _sqrt(float x):
         return sqrt(x)
 
 
-def zmuv(
+def zmuv_rows(
     np.ndarray[DTYPE_t, ndim=2] arr
     ):
 
