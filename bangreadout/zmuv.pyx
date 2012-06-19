@@ -97,5 +97,5 @@ def zmuv_rows_inplace(
     # -- computing the final output array (zero mean, unit variance of the input)
     for i in prange(rows, nogil=True):
 
-        for j in prange(cols):
+        for j in range(cols):
             arr[i, j] = std_inv[i] * (arr[i, j] - mean[i])
