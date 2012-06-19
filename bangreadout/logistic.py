@@ -170,7 +170,7 @@ if __name__ == '__main__':
     n_features = 100
     X = np.random.randn(n_points, n_features)
     Y = np.random.randn(n_points) > 0
-    X[Y] += .1
+    X[Y] += .3
     print len(X), len(Y)
 
     clf = AverageLBFGSLogisticClassifier(n_features)
