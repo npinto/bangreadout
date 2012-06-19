@@ -16,7 +16,7 @@
 # for splitting of features?)
 
 
-__all__ = ['LBGFSLogisticClassifier']
+__all__ = ['LBFGSLogisticClassifier']
 
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
@@ -32,7 +32,7 @@ DEFAULT_LBFGS_PARAMS = dict(
     )
 
 
-class LBGFSLogisticClassifier(object):
+class LBFGSLogisticClassifier(object):
 
     def __init__(self,
                  n_features,
@@ -120,7 +120,7 @@ class LBGFSLogisticClassifier(object):
         return Y_pred
 
 
-class AverageLBGFSLogisticClassifier(object):
+class AverageLBFGSLogisticClassifier(object):
 
     def __init__(self,
                  n_features,
@@ -135,7 +135,7 @@ class AverageLBGFSLogisticClassifier(object):
         self.b = np.zeros((2), dtype='float32')
         # XXX: coef_ & intercept_ ? (i.e. a-la sklearn)
         self.n_iter = 0
-        self.clf = LBGFSLogisticClassifier(n_features, lbfgs_params)
+        self.clf = LBFGSLogisticClassifier(n_features, lbfgs_params)
 
 
     def partial_fit(self, X, Y):
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     X[Y] += .1
     print len(X), len(Y)
 
-    clf = AverageLBGFSLogisticClassifier(n_features)
+    clf = AverageLBFGSLogisticClassifier(n_features)
     clf.partial_fit(X[::2], Y[::2])
     Y_pred = clf.predict(X)
     print (Y_pred == Y).mean()
