@@ -1,11 +1,12 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: nonecheck=False
+# cython: cdivision=True
 
 import numpy as np
 cimport numpy as np
 
-from libc.math cimport sqrt
+from libc.math cimport sqrt, pow
 from cython.parallel import prange
 
 DTYPE = np.float32
@@ -99,3 +100,37 @@ def zmuv_rows_inplace(
 
         for j in range(cols):
             arr[i, j] = std_inv[i] * (arr[i, j] - mean[i])
+
+
+def zmuv_rows_inplace_untested(
+    np.ndarray[DTYPE_t, ndim=2] arr
+    ):
+
+    cdef Py_ssize_t rows = arr.shape[0]
+    cdef Py_ssize_t cols = arr.shape[1]
+
+    cdef np.ndarray[DTYPE_t, ndim=1] _sum = np.zeros(rows, dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=1] _ssq = np.zeros(rows, dtype=DTYPE)
+
+    cdef Py_ssize_t i
+    cdef Py_ssize_t j
+    cdef DTYPE_t scaler = 1. / <DTYPE_t>cols
+    cdef DTYPE_t val, _sum_i, _ssq_i, div
+
+    # -- sum and ssq
+    for i in prange(rows, nogil=True):
+        for j in range(cols):
+            val = arr[i, j]
+            _sum[i] += val
+            _ssq[i] += val * val
+
+    # -- zmuv
+    for i in prange(rows, nogil=True):
+        _sum_i = _sum[i]
+        _ssq_i = _ssq[i]
+        for j in range(cols):
+            val = arr[i, j]
+            val = val - (scaler * _sum_i)  # zero-mean
+            div = sqrt((scaler * _ssq_i) - pow((scaler * _sum_i), 2))  # unit-variance
+            val = val / div
+            arr[i, j] = val

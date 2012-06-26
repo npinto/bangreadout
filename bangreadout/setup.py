@@ -19,7 +19,16 @@ def configuration(parent_package='', top_path=None):
         extra_compile_args=[
             "-fopenmp",
             "-pthread",
-            "-O3"
+            "-O6",
+            "-march=native",
+            "-mtune=native",
+            "-funroll-all-loops",
+            "-fomit-frame-pointer",
+            "-march=native",
+            "-mtune=native",
+            "-msse4",
+            "-ftree-vectorize",
+            "-ftree-vectorizer-verbose=5",
         ],
         extra_link_args=['-fopenmp'],
         )
