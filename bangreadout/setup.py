@@ -29,6 +29,12 @@ def configuration(parent_package='', top_path=None):
             "-msse4",
             "-ftree-vectorize",
             "-ftree-vectorizer-verbose=5",
+            "-ffast-math",
+            #"-foptimize-register-move",
+            #"-funswitch-loops",
+            #"-ftree-loop-distribution",
+            #"-funroll-loops",
+            #"-ftree-parallelize-loops=4",
         ],
         extra_link_args=['-fopenmp'],
         )
