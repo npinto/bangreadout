@@ -20,6 +20,7 @@ DEFAULT_LBFGS_PARAMS = dict(
     factr=1e7,
     maxfun=1e4,
     )
+DEFAULT_M = 0.1
 
 
 class LBFGSSqHingeClassifier(object):
@@ -27,6 +28,7 @@ class LBFGSSqHingeClassifier(object):
     def __init__(self,
                  n_features,
                  lbfgs_params=DEFAULT_LBFGS_PARAMS,
+                 m=DEFAULT_M
                 ):
 
         self.n_features = n_features
@@ -34,6 +36,7 @@ class LBFGSSqHingeClassifier(object):
 
         self.W = np.empty((n_features,), dtype=np.float32)
         self.b = np.empty((1), dtype=np.float32)
+        self.m = m
 
 
     def fit(self, X, Y):
@@ -55,7 +58,7 @@ class LBFGSSqHingeClassifier(object):
 
         # -- initial variables
         w_size = w.size
-        m = 0.1
+        m = self.m
 
         # -- theano program
         t_X = T.fmatrix()
@@ -133,6 +136,7 @@ class AverageLBFGSSqHingeClassifier(object):
     def __init__(self,
                  n_features,
                  lbfgs_params=DEFAULT_LBFGS_PARAMS,
+                 m=DEFAULT_M
                 ):
 
         self.n_features = n_features
@@ -140,8 +144,10 @@ class AverageLBFGSSqHingeClassifier(object):
 
         self.W = np.zeros((n_features), dtype=np.float32)
         self.b = np.zeros((1), dtype=np.float32)
+
         self.n_iter = 0
-        self.clf = LBFGSSqHingeClassifier(n_features, lbfgs_params)
+        self.clf = LBFGSSqHingeClassifier(n_features, lbfgs_params,
+                                          m=m)
 
 
     def partial_fit(self, X, Y):
