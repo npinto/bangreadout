@@ -18,6 +18,8 @@
 
 __all__ = ['LBFGSLogisticClassifier']
 
+from sys import stdout
+
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
@@ -48,7 +50,7 @@ class LBFGSLogisticClassifier(object):
         # XXX: coef_ & intercept_ ? (i.e. a-la sklearn)
 
 
-    def fit(self, X, Y):
+    def fit(self, X, Y, reinitialize=True):
 
         assert X.ndim == 2
         assert Y.ndim == 1
@@ -58,8 +60,9 @@ class LBFGSLogisticClassifier(object):
         assert X.shape[1] == self.n_features
 
         Y_true = Y.ravel().astype(np.int32)
-        self.W[:] = 1
-        self.b[:] = 0
+        if reinitialize:
+            self.W[:] = 1
+            self.b[:] = 0
 
         # -- initial variables
         W_size = self.W.size
@@ -87,6 +90,8 @@ class LBFGSLogisticClassifier(object):
                                 allow_input_downcast=True)
 
         def minimize_me(vars):
+            stdout.write('.')
+            stdout.flush()
             # unpack W and b
             W = vars[:W_size].reshape(W_shape)
             b = vars[W_size:]
@@ -138,17 +143,16 @@ class AverageLBFGSLogisticClassifier(object):
         self.clf = LBFGSLogisticClassifier(n_features, lbfgs_params)
 
 
-    def partial_fit(self, X, Y):
-        self.clf.fit(X, Y)
+    def partial_fit(self, X, Y, reinitialize=True):
+        self.clf.fit(X, Y, reinitialize=reinitialize)
         self.n_iter += 1
         alpha = 1.0 / self.n_iter
         self.W = (1.0 - alpha) * self.W + alpha * self.clf.W
         self.b = (1.0 - alpha) * self.b + alpha * self.clf.b
         return self
 
-
-    def fit(self, X, Y):
-        return self.partial_fit(X, Y)
+    def fit(self, X, Y, reinitialize=True):
+        return self.partial_fit(X, Y, reinitialize=reinitialize)
 
 
     def transform(self, X):
