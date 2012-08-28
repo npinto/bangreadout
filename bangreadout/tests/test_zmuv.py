@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-"""Simple test for Cython zmuv function """
+"""Simple test for Cython zmuv (zero-mean / unit-variance) function """
 
 # Authors: Nicolas Poilvert <nicolas.poilvert@gmail.com>
 #          Nicolas Pinto <nicolas.pinto@gmail.com>
