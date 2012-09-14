@@ -16,7 +16,7 @@
 # for splitting of features?)
 
 
-__all__ = ['LBFGSLogisticClassifier']
+__all__ = ['LBFGSLogisticClassifier', 'AverageLBFGSLogisticClassifier']
 
 from sys import stdout
 
