@@ -45,8 +45,8 @@ class LBFGSLogisticClassifier(object):
         self.lbfgs_params = lbfgs_params
 
         # stupid binary logreg implementation
-        self.W = np.empty((n_features, 2), dtype='float32')
-        self.b = np.empty((2), dtype='float32')
+        self.W = np.ones((n_features, 2), dtype='float32')
+        self.b = np.zeros((2), dtype='float32')
         # XXX: coef_ & intercept_ ? (i.e. a-la sklearn)
 
 
