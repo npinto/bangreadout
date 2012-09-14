@@ -1,7 +1,7 @@
 import time
 import numpy as np
 
-from scikits.learn import svm
+from sklearn import svm
 
 # --
 DEFAULT_C = 1e5
