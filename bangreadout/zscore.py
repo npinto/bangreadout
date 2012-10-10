@@ -76,6 +76,8 @@ class ZScorer(object):
             self._rows_std = rows_std_new
             self._n_samples = n_samples_new
 
+        return self
+
     def transform(self, X):
         _check_X(X)
         assert self._rows_mean is not None
