@@ -72,9 +72,9 @@ class ZScorer(object):
                 rows_mean_new ** 2.
                 )
 
-            self._rows_mean = rows_mean_new
-            self._rows_std = rows_std_new
-            self._n_samples = n_samples_new
+            self._rows_mean = rows_mean_new.astype('float32')
+            self._rows_std = rows_std_new.astype('float32')
+            self._n_samples = n_samples_new.astype('float32')
 
         return self
 
@@ -82,7 +82,7 @@ class ZScorer(object):
         _check_X(X)
         assert self._rows_mean is not None
         assert self._rows_std is not None
-        out = X.copy()
+        out = X.copy().astype('float32')
         zmuv_rows_apply_inplace(out.T, self._rows_mean, self._rows_std)
         out[~np.isfinite(out)] = 0
         return out
