@@ -74,7 +74,7 @@ class ZScorer(object):
 
             self._rows_mean = rows_mean_new.astype('float32')
             self._rows_std = rows_std_new.astype('float32')
-            self._n_samples = n_samples_new.astype('float32')
+            self._n_samples = n_samples_new
 
         return self
 
